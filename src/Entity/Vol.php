@@ -1,0 +1,198 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\VolRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: VolRepository::class)]
+class Vol
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $NumVol = null;
+
+    #[ORM\Column]
+    private ?\DateTime $DateDepart = null;
+
+    #[ORM\Column]
+    private ?\DateTime $DateArrive = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $port = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $escale = null;
+
+    #[ORM\Column]
+    private ?int $placesDisponibles = null;
+
+    /**
+     * @var Collection<int, Reservation>
+     */
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'vol')]
+    private Collection $reservations;
+
+    #[ORM\ManyToOne(inversedBy: 'vols')]
+    private ?Aeroport $depart = null;
+
+    #[ORM\ManyToOne]
+    private ?Aeroport $arrivee = null;
+
+    #[ORM\ManyToOne(inversedBy: 'vols')]
+    private ?Avion $avion = null;
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getNumVol(): ?string
+    {
+        return $this->NumVol;
+    }
+
+    public function setNumVol(string $NumVol): static
+    {
+        $this->NumVol = $NumVol;
+
+        return $this;
+    }
+
+    public function getDateDepart(): ?\DateTime
+    {
+        return $this->DateDepart;
+    }
+
+    public function setDateDepart(\DateTime $DateDepart): static
+    {
+        $this->DateDepart = $DateDepart;
+
+        return $this;
+    }
+
+    public function getDateArrive(): ?\DateTime
+    {
+        return $this->DateArrive;
+    }
+
+    public function setDateArrive(\DateTime $DateArrive): static
+    {
+        $this->DateArrive = $DateArrive;
+
+        return $this;
+    }
+
+    public function getPort(): ?string
+    {
+        return $this->port;
+    }
+
+    public function setPort(string $port): static
+    {
+        $this->port = $port;
+
+        return $this;
+    }
+
+    public function getEscale(): ?string
+    {
+        return $this->escale;
+    }
+
+    public function setEscale(?string $escale): static
+    {
+        $this->escale = $escale;
+
+        return $this;
+    }
+
+    public function getPlacesDisponibles(): ?int
+    {
+        return $this->placesDisponibles;
+    }
+
+    public function setPlacesDisponibles(int $placesDisponibles): static
+    {
+        $this->placesDisponibles = $placesDisponibles;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): static
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setVol($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): static
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getVol() === $this) {
+                $reservation->setVol(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDepart(): ?Aeroport
+    {
+        return $this->depart;
+    }
+
+    public function setDepart(?Aeroport $depart): static
+    {
+        $this->depart = $depart;
+
+        return $this;
+    }
+
+    public function getArrivee(): ?Aeroport
+    {
+        return $this->arrivee;
+    }
+
+    public function setArrivee(?Aeroport $arrivee): static
+    {
+        $this->arrivee = $arrivee;
+
+        return $this;
+    }
+
+    public function getAvion(): ?Avion
+    {
+        return $this->avion;
+    }
+
+    public function setAvion(?Avion $avion): static
+    {
+        $this->avion = $avion;
+
+        return $this;
+    }
+}
