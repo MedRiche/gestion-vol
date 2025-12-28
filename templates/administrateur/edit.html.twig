@@ -1,13 +1,261 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Administrateur - AeroManager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block title %}Edit Administrateur{% endblock %}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
 
-{% block body %}
-    <h1>Edit Administrateur</h1>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    {{ include('administrateur/_form.html.twig', {'button_label': 'Update'}) }}
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
 
-    <a href="{{ path('app_administrateur_index') }}">back to list</a>
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
 
-    {{ include('administrateur/_delete_form.html.twig') }}
-{% endblock %}
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .card-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-header p {
+            color: #666;
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:disabled {
+            background: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .btn {
+            padding: 0.9rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .delete-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .delete-form {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            color: #856404;
+        }
+
+        .warning-box strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-actions, .delete-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="{{ path('app_administrateur_index') }}" class="back-link">← Retour à la liste</a>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="icon">✏️</div>
+            <h1>Modifier l'Administrateur</h1>
+            <p>ID: #{{ administrateur.id }} | Matricule: {{ administrateur.matricule }}</p>
+        </div>
+
+        {{ form_start(form) }}
+        <div class="form-group">
+            {{ form_label(form.matricule, 'Matricule') }}
+            {{ form_widget(form.matricule, {'attr': {'class': 'form-control', 'placeholder': 'Ex: ADM001'}}) }}
+            <div class="help-text">Identifiant unique de l'administrateur</div>
+            {{ form_errors(form.matricule) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.niveauAcces, 'Niveau d\'Accès') }}
+            {{ form_widget(form.niveauAcces, {'attr': {'class': 'form-control'}}) }}
+            <div class="help-text">
+                1 = Accès de base | 2 = Accès intermédiaire | 3 = Accès complet
+            </div>
+            {{ form_errors(form.niveauAcces) }}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                💾 Enregistrer les modifications
+            </button>
+            <a href="{{ path('app_administrateur_show', {'id': administrateur.id}) }}" class="btn btn-secondary">
+                ❌ Annuler
+            </a>
+        </div>
+        {{ form_end(form) }}
+
+        <div class="delete-section">
+            <div class="warning-box">
+                <strong>⚠️ Zone dangereuse</strong>
+                La suppression de cet administrateur est irréversible.
+            </div>
+
+            <form method="post" action="{{ path('app_administrateur_delete', {'id': administrateur.id}) }}" class="delete-form" onsubmit="return confirm('Êtes-vous absolument sûr de vouloir supprimer cet administrateur ? Cette action est irréversible.');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ administrateur.id) }}">
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Supprimer l'administrateur
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

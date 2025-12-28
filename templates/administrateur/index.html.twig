@@ -1,37 +1,302 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Administrateurs - AeroManager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block title %}Administrateur index{% endblock %}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
 
-{% block body %}
-    <h1>Administrateur index</h1>
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Matricule</th>
-                <th>NiveauAcces</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for administrateur in administrateurs %}
-            <tr>
-                <td>{{ administrateur.id }}</td>
-                <td>{{ administrateur.matricule }}</td>
-                <td>{{ administrateur.niveauAcces }}</td>
-                <td>
-                    <a href="{{ path('app_administrateur_show', {'id': administrateur.id}) }}">show</a>
-                    <a href="{{ path('app_administrateur_edit', {'id': administrateur.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    <a href="{{ path('app_administrateur_new') }}">Create new</a>
-{% endblock %}
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        thead th {
+            padding: 1rem;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            border: none;
+        }
+
+        thead th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        thead th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.3s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody td {
+            padding: 1rem;
+            color: #333;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-admin {
+            background: #667eea;
+            color: white;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            tbody td {
+                padding: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/" class="back-link">← Retour au tableau de bord</a>
+
+    <div class="header">
+        <h1>
+            <span>👨‍💼</span>
+            Gestion des Administrateurs
+        </h1>
+        <a href="{{ path('app_administrateur_new') }}" class="btn btn-primary">
+            ➕ Nouvel Administrateur
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="table-container">
+            {% if administrateurs|length > 0 %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Matricule</th>
+                        <th>Niveau d'Accès</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for administrateur in administrateurs %}
+                        <tr>
+                            <td><strong>#{{ administrateur.id }}</strong></td>
+                            <td>{{ administrateur.matricule }}</td>
+                            <td>
+                                <span class="badge badge-admin">
+                                    Niveau {{ administrateur.niveauAcces }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="{{ path('app_administrateur_show', {'id': administrateur.id}) }}" class="btn btn-view btn-small">
+                                        👁️ Voir
+                                    </a>
+                                    <a href="{{ path('app_administrateur_edit', {'id': administrateur.id}) }}" class="btn btn-edit btn-small">
+                                        ✏️ Modifier
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">👨‍💼</div>
+                    <h3>Aucun administrateur trouvé</h3>
+                    <p>Commencez par créer votre premier administrateur</p>
+                    <a href="{{ path('app_administrateur_new') }}" class="btn btn-primary" style="margin-top: 1rem;">
+                        ➕ Créer un Administrateur
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

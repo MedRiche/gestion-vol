@@ -33,6 +33,8 @@ final class AdministrateurController extends AbstractController
             $entityManager->persist($administrateur);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Administrateur créé avec succès !');
+
             return $this->redirectToRoute('app_administrateur_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -59,6 +61,8 @@ final class AdministrateurController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            $this->addFlash('success', 'Administrateur modifié avec succès !');
+
             return $this->redirectToRoute('app_administrateur_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -74,6 +78,10 @@ final class AdministrateurController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$administrateur->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($administrateur);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Administrateur supprimé avec succès !');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide. Suppression refusée.');
         }
 
         return $this->redirectToRoute('app_administrateur_index', [], Response::HTTP_SEE_OTHER);

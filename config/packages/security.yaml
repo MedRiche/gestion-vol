@@ -19,11 +19,16 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator: App\Security\LoginFromAuthenticator
+
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                default_target_path: /
+
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
+                target: /
 
             remember_me:
                 secret: '%kernel.secret%'
