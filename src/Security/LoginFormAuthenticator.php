@@ -16,6 +16,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Administrateur;
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -32,12 +33,15 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     public function authenticate(Request $request): Passport
     {
         $email = $request->getPayload()->getString('email');
+        if (!$email) {
+            $email = $request->getPayload()->getString('_username');
+        }
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
         return new Passport(
             new UserBadge($email),
-            new PasswordCredentials($request->getPayload()->getString('password')),
+            new PasswordCredentials($request->getPayload()->getString('password') ?: $request->getPayload()->getString('_password')),
             [
                 new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
                 new RememberMeBadge(),
@@ -49,7 +53,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     {
         // Mettre à jour la dernière connexion pour les administrateurs
         $user = $token->getUser();
-        if (method_exists($user, 'setDernierConnexion')) {
+        if ($user instanceof Administrateur) {
             $user->setDernierConnexion(new \DateTime());
             $this->entityManager->flush();
         }

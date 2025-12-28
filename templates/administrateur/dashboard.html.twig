@@ -1,0 +1,376 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Administrateur - AeroManager{% endblock %}
+
+{% block body %}
+    <style>
+        body {
+            background: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        .stat-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.3;
+        }
+        .border-left-primary {
+            border-left: 4px solid #667eea;
+        }
+        .border-left-success {
+            border-left: 4px solid #1cc88a;
+        }
+        .border-left-info {
+            border-left: 4px solid #36b9cc;
+        }
+        .border-left-warning {
+            border-left: 4px solid #f6c23e;
+        }
+        .action-btn {
+            border-radius: 10px;
+            padding: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .section-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        .section-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px 15px 0 0;
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .nav-card {
+            border-radius: 10px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        .nav-card:hover {
+            border-left-color: #667eea;
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+    </style>
+
+    <div class="dashboard-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard Administrateur
+                    </h1>
+                    <p class="mb-0 opacity-75">Vue d'ensemble de votre système de gestion aérienne</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ path('app_logout') }}" class="btn btn-light">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Statistiques principales -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card card border-left-primary h-100">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div class="text-uppercase text-primary fw-bold small mb-1">
+                                    Vols Total
+                                </div>
+                                <div class="h3 mb-0 fw-bold text-gray-800">{{ stats.total_vols }}</div>
+                                <div class="small text-success mt-2">
+                                    <i class="fas fa-calendar-day"></i> {{ stats.vols_aujourdhui }} aujourd'hui
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-plane stat-icon text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card card border-left-success h-100">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div class="text-uppercase text-success fw-bold small mb-1">
+                                    Avions
+                                </div>
+                                <div class="h3 mb-0 fw-bold text-gray-800">{{ stats.total_avions }}</div>
+                                <div class="small text-success mt-2">
+                                    <i class="fas fa-check-circle"></i> {{ stats.avions_disponibles }} disponibles
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-plane-departure stat-icon text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card card border-left-info h-100">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div class="text-uppercase text-info fw-bold small mb-1">
+                                    Réservations
+                                </div>
+                                <div class="h3 mb-0 fw-bold text-gray-800">{{ stats.total_reservations }}</div>
+                                <div class="small text-success mt-2">
+                                    <i class="fas fa-check"></i> {{ stats.reservations_confirmees }} confirmées
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clipboard-list stat-icon text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card card border-left-warning h-100">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div class="text-uppercase text-warning fw-bold small mb-1">
+                                    Clients
+                                </div>
+                                <div class="h3 mb-0 fw-bold text-gray-800">{{ stats.total_clients }}</div>
+                                <div class="small text-muted mt-2">
+                                    <i class="fas fa-users"></i> Utilisateurs inscrits
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users stat-icon text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="section-card card">
+            <div class="section-header">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-cogs text-primary"></i> Actions Rapides
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{{ path('app_admin_vols_new') }}" class="btn btn-primary action-btn w-100">
+                            <i class="fas fa-plus-circle"></i> Créer un Vol
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ path('app_admin_avions_new') }}" class="btn btn-success action-btn w-100">
+                            <i class="fas fa-plane"></i> Ajouter un Avion
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ path('app_aeroport_new') }}" class="btn btn-info action-btn w-100">
+                            <i class="fas fa-building"></i> Ajouter un Aéroport
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ path('app_admin_rapports') }}" class="btn btn-warning action-btn w-100">
+                            <i class="fas fa-chart-bar"></i> Voir Rapports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers vols et réservations -->
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="section-card card">
+                    <div class="section-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-plane text-primary"></i> Derniers Vols
+                        </h5>
+                        <a href="{{ path('app_admin_vols_index') }}" class="btn btn-sm btn-primary">
+                            Voir tout
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if derniers_vols is empty %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-plane fa-3x mb-3 opacity-25"></i>
+                                <p>Aucun vol enregistré</p>
+                                <a href="{{ path('app_admin_vols_new') }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus"></i> Créer le premier vol
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>N° Vol</th>
+                                        <th>Départ</th>
+                                        <th>Arrivée</th>
+                                        <th>Date</th>
+                                        <th>Places</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for vol in derniers_vols %}
+                                        <tr>
+                                            <td><strong>{{ vol.numVol }}</strong></td>
+                                            <td>{{ vol.depart ? vol.depart.ville : 'N/A' }}</td>
+                                            <td>{{ vol.arrivee ? vol.arrivee.ville : 'N/A' }}</td>
+                                            <td><small>{{ vol.dateDepart|date('d/m/Y H:i') }}</small></td>
+                                            <td>
+                                                <span class="badge bg-info">{{ vol.placesDisponibles }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="section-card card">
+                    <div class="section-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-clipboard-list text-success"></i> Dernières Réservations
+                        </h5>
+                        <a href="{{ path('app_admin_reservations_index') }}" class="btn btn-sm btn-success">
+                            Voir tout
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if dernieres_reservations is empty %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-clipboard-list fa-3x mb-3 opacity-25"></i>
+                                <p>Aucune réservation enregistrée</p>
+                            </div>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>Référence</th>
+                                        <th>Client</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for reservation in dernieres_reservations %}
+                                        <tr>
+                                            <td><strong>{{ reservation.reference }}</strong></td>
+                                            <td>
+                                                {% if reservation.client and reservation.client.user %}
+                                                    {{ reservation.client.user.nomComplet }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                            <td><small>{{ reservation.dateRes|date('d/m/Y H:i') }}</small></td>
+                                            <td>
+                                                {% if reservation.satut == 'confirmé' %}
+                                                    <span class="badge bg-success">Confirmé</span>
+                                                {% elseif reservation.satut == 'en attente' %}
+                                                    <span class="badge bg-warning">En attente</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ reservation.satut }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu de navigation principal -->
+        <div class="section-card card">
+            <div class="section-header">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-list text-primary"></i> Gestion Complète
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <a href="{{ path('app_admin_vols_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-plane text-primary me-2"></i> Gestion des Vols
+                        </a>
+                        <a href="{{ path('app_admin_avions_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-plane-departure text-success me-2"></i> Gestion des Avions
+                        </a>
+                        <a href="{{ path('app_aeroport_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-building text-info me-2"></i> Gestion des Aéroports
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ path('app_admin_reservations_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-clipboard-list text-warning me-2"></i> Gestion des Réservations
+                        </a>
+                        <a href="{{ path('app_ticket_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-ticket-alt text-danger me-2"></i> Gestion des Tickets
+                        </a>
+                        <a href="{{ path('app_paiement_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-credit-card text-success me-2"></i> Gestion des Paiements
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ path('app_admin_clients_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-users text-primary me-2"></i> Gestion des Clients
+                        </a>
+                        <a href="{{ path('app_passager_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-user text-info me-2"></i> Gestion des Passagers
+                        </a>
+                        <a href="{{ path('app_administrateur_index') }}" class="nav-card list-group-item list-group-item-action p-3">
+                            <i class="fas fa-user-shield text-danger me-2"></i> Gestion des Administrateurs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

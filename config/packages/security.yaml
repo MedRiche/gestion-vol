@@ -1,30 +1,28 @@
 security:
-    # Configuration des hashers de mot de passe
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-        App\Entity\Administrateur:
-            algorithm: auto
         App\Entity\Utilisateur:
             algorithm: auto
+        App\Entity\Administrateur:
+            algorithm: auto
 
-    # Providers pour Admin et User
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        # Provider pour les administrateurs
-        admin_provider:
-            entity:
-                class: App\Entity\Administrateur
-                property: email
-
-        # Provider pour les clients/utilisateurs
-        user_provider:
+        # Provider pour les utilisateurs/clients
+        app_user_provider:
             entity:
                 class: App\Entity\Utilisateur
                 property: email
-
-        # Provider combiné qui cherche dans les deux entités
-        combined_provider:
+        # Provider pour les administrateurs
+        app_admin_provider:
+            entity:
+                class: App\Entity\Administrateur
+                property: email
+        # Provider combiné (chaîne de providers)
+        chain_provider:
             chain:
-                providers: ['admin_provider', 'user_provider']
+                providers: ['app_user_provider', 'app_admin_provider']
 
     firewalls:
         dev:
@@ -33,52 +31,37 @@ security:
 
         main:
             lazy: true
-            provider: combined_provider
+            provider: chain_provider
 
-            custom_authenticator: App\Security\LoginFormAuthenticator
+            # Configuration de l'authentificateur personnalisé
+            custom_authenticators:
+                - App\Security\LoginFormAuthenticator
 
+            # Configuration de la déconnexion
             logout:
                 path: app_logout
                 target: app_home
 
+            # Remember me
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800 # 1 semaine
                 path: /
-                always_remember_me: true
+                always_remember_me: false
 
-            # Activation de la vérification des utilisateurs
-            entry_point: App\Security\LoginFormAuthenticator
-
-    # Contrôle d'accès
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
     access_control:
-        # Routes publiques
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/$, roles: PUBLIC_ACCESS }
-
-        # Routes admin (nécessite ROLE_ADMIN)
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/administrateur, roles: ROLE_ADMIN }
-
-        # Routes client (nécessite ROLE_USER)
         - { path: ^/client, roles: ROLE_USER }
-
-        # Routes partagées (authentification requise)
-        - { path: ^/reservation, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/ticket, roles: IS_AUTHENTICATED_FULLY }
-
-    # Configuration des rôles hiérarchiques
-    role_hierarchy:
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_USER]
-        ROLE_ADMIN: [ROLE_USER]
 
 when@test:
     security:
         password_hashers:
-            # Configuration pour les tests
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Valeur minimale pour bcrypt
-                time_cost: 3 # Valeur minimale pour argon
-                memory_cost: 10 # Valeur minimale pour argon
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

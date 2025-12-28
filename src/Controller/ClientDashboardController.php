@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Utilisateur;
 use App\Repository\ReservationRepository;
 use App\Repository\TicketRepository;
 use App\Repository\VolRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/client')]
@@ -21,6 +22,12 @@ class ClientDashboardController extends AbstractController
         VolRepository $volRepository
     ): Response {
         $user = $this->getUser();
+
+        if (!$user instanceof Utilisateur) {
+            $this->addFlash('error', 'Utilisateur non valide.');
+            return $this->redirectToRoute('app_login');
+        }
+
         $client = $user->getClient();
 
         if (!$client) {
@@ -64,6 +71,12 @@ class ClientDashboardController extends AbstractController
     public function profil(): Response
     {
         $user = $this->getUser();
+
+        if (!$user instanceof Utilisateur) {
+            $this->addFlash('error', 'Utilisateur non valide.');
+            return $this->redirectToRoute('app_login');
+        }
+
         $client = $user->getClient();
 
         if (!$client) {
@@ -80,6 +93,12 @@ class ClientDashboardController extends AbstractController
     public function reservations(ReservationRepository $reservationRepository): Response
     {
         $user = $this->getUser();
+
+        if (!$user instanceof Utilisateur) {
+            $this->addFlash('error', 'Utilisateur non valide.');
+            return $this->redirectToRoute('app_login');
+        }
+
         $client = $user->getClient();
 
         if (!$client) {
@@ -101,6 +120,12 @@ class ClientDashboardController extends AbstractController
     public function tickets(ReservationRepository $reservationRepository): Response
     {
         $user = $this->getUser();
+
+        if (!$user instanceof Utilisateur) {
+            $this->addFlash('error', 'Utilisateur non valide.');
+            return $this->redirectToRoute('app_login');
+        }
+
         $client = $user->getClient();
 
         if (!$client) {

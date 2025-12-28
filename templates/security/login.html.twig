@@ -165,17 +165,6 @@
             accent-color: #667eea;
         }
 
-        .forgot-password {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        .forgot-password:hover {
-            color: #764ba2;
-        }
-
         .btn-login {
             width: 100%;
             padding: 1rem;
@@ -211,34 +200,11 @@
         }
 
         .divider span {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 0 1rem;
             color: #999;
             font-size: 0.9rem;
             position: relative;
-        }
-
-        .social-login {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .btn-social {
-            flex: 1;
-            padding: 0.8rem;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 12px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-social:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .signup-link {
@@ -296,6 +262,12 @@
             border: 1px solid #fcc;
         }
 
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
         @media (max-width: 768px) {
             .login-card { padding: 2rem 1.5rem; }
             .back-home { top: 1rem; left: 1rem; }
@@ -317,11 +289,17 @@
 
         {% if error %}
             <div class="alert alert-error">
-                {{ error.messageKey|trans(error.messageData, 'security') }}
+                ❌ {{ error.messageKey|trans(error.messageData, 'security') }}
             </div>
         {% endif %}
 
-        <form method="post">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                ✅ {{ message }}
+            </div>
+        {% endfor %}
+
+        <form method="post" action="{{ path('app_login') }}">
             <div class="form-group">
                 <label for="username">Email</label>
                 <div class="input-wrapper">
@@ -361,20 +339,13 @@
                     <input type="checkbox" name="_remember_me">
                     <span>Se souvenir de moi</span>
                 </label>
-                <a href="#" class="forgot-password">Mot de passe oublié ?</a>
             </div>
 
             <button type="submit" class="btn-login">Se connecter</button>
         </form>
 
         <div class="divider">
-            <span>ou continuer avec</span>
-        </div>
-
-        <div class="social-login">
-            <button class="btn-social">🔵</button>
-            <button class="btn-social">🟦</button>
-            <button class="btn-social">⚫</button>
+            <span>Nouveau sur AeroManager ?</span>
         </div>
 
         <div class="signup-link">
